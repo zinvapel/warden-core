@@ -8,7 +8,7 @@ import (
 var env *environment.Environment
 
 func init() {
-	defaultEnv, err := environment.DefaultEnvironment()
+	defaultEnv, err := warden.DefaultEnvironment()
 
 	if err != nil {
 		panic(err)

@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/zinvapel/warden-core/internal/command/play"
 	"github.com/zinvapel/warden-core/pkg/registry"
 	"github.com/zinvapel/warden-core/pkg/utils/fs"
 	"os"
@@ -81,9 +80,7 @@ func (env *Environment) Init() {
 
 	env.Registries = make(map[string]registry.Client)
 	env.Extensions = make([]*cobra.Command, 0)
-	env.Walkers = map[string]registry.Walker{
-		"script": &play.Script{},
-	}
+	env.Walkers = map[string]registry.Walker{}
 }
 
 func (env *Environment) Doctor() error {
