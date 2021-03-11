@@ -31,6 +31,9 @@ func DefaultEnvironment() (*environment.Environment, error) {
 			Home: home + DefaultHome,
 			ConfigPaths: []string{home + DefaultHome},
 			Cache: true,
+			FetchStrategy: &environment.GitStrategy{
+				MainBranch: "master",
+			},
 		}
 
 		env.Init()

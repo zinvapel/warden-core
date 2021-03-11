@@ -32,10 +32,7 @@ type Environment struct {
 	Walkers map[string]Walker
 
 	Cache bool
-}
-
-type Walker interface {
-	Walk(source *registry.Source, env *Environment, extra string) error
+	FetchStrategy FetchStrategy
 }
 
 func (env *Environment) Init() {
@@ -76,8 +73,8 @@ func (env *Environment) WarmJobFor(src *registry.Source) (string, error) {
 		if err != nil {
 			return "", err
 		}
-	} else {
-		if err := env.FetchSourceInto(src, dir); err != nil {
+	} else if env.FetchStrategy != nil {
+		if err := env.FetchStrategy.FetchSourceInto(src, dir); err != nil {
 			return "", err
 		}
 	}
@@ -119,37 +116,8 @@ func (env *Environment) SetUp() error {
 	for name, src := range sources {
 		baseDir := env.Home + gitDir + "/" + name + "/"
 
-		if err := env.FetchSourceInto(src, baseDir); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (env *Environment) FetchSourceInto(src *registry.Source, baseDir string) error {
-	if _, err := fs.GetOrCreateDir(baseDir); err != nil {
-		return err
-	}
-
-	for _, repo := range src.ConfigRepos {
-		fmt.Println("Processing repo", repo.Name)
-
-		if fs.Exist(baseDir + repo.Name) {
-			// @todo add login/pass or ssh_keys
-			if err := fs.ContinueIn(baseDir + repo.Name, "git checkout -- ."); err != nil {
-				return err
-			}
-
-			if err := fs.ContinueIn(baseDir + repo.Name, "git checkout master"); err != nil {
-				return err
-			}
-
-			if err := fs.ContinueIn(baseDir + repo.Name, "git pull origin master"); err != nil {
-				return err
-			}
-		} else {
-			if err := fs.ContinueIn(baseDir, "git clone " + repo.Url + " " + repo.Name); err != nil {
+		if env.FetchStrategy != nil {
+			if err := env.FetchStrategy.FetchSourceInto(src, baseDir); err != nil {
 				return err
 			}
 		}

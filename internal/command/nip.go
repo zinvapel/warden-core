@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"github.com/zinvapel/warden-core/pkg/environment"
 	"github.com/zinvapel/warden-core/pkg/registry"
+	"os"
 )
 
 func Nip() *cobra.Command {
@@ -58,6 +59,12 @@ func Nip() *cobra.Command {
 
 				if err := env.Config.WriteConfig(); err != nil {
 					cmd.PrintErrf("Unable to write config '%s'\n", err)
+					os.Exit(1)
+				}
+
+				if err := env.SetUp(); err != nil {
+					cmd.PrintErrf("Unable to doctor '%s'\n", err)
+					os.Exit(1)
 				}
 			} else {
 				cmd.PrintErrln("Unable to get environment")
