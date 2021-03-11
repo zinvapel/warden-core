@@ -37,7 +37,7 @@ func Play() *cobra.Command {
 					os.Exit(1)
 				}
 
-				err := env.Walkers[args[1]].Walk(src, cmd.Flag("extra").Value.String(), env)
+				err := env.Walkers[args[1]].Walk(src, env, cmd.Flag("extra").Value.String())
 				if err != nil {
 					cmd.PrintErrln("Error on play", err)
 				}

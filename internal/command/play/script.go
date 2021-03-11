@@ -12,7 +12,7 @@ import (
 
 type Script struct {}
 
-func (s *Script) Walk(source *registry.Source, extra string, env *environment.Environment) error {
+func (s *Script) Walk(source *registry.Source, env *environment.Environment, extra string) error {
 	settings := make(map[string]string)
 
 	if err := json.Unmarshal([]byte(extra), &settings); err != nil {

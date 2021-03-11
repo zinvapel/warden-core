@@ -11,7 +11,7 @@ func Doctor() *cobra.Command {
 		Short: "Verify and set up warden environment",
 		Run: func(cmd *cobra.Command, args []string) {
 			if env := environment.Unwrap(cmd); env != nil {
-				if err := env.Doctor(); err != nil {
+				if err := env.SetUp(); err != nil {
 					cmd.PrintErrf("Unable to doctor '%s'\n", err)
 				}
 			} else {

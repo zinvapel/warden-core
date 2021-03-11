@@ -14,8 +14,6 @@ const (
 	varDir = "/var"
 	jobDir = varDir + "/jobs"
 	gitDir = "/git"
-	binDir = "/bin"
-	srcDir = "/src"
 
 	configName = "config"
 	configType = "yaml"
@@ -31,9 +29,32 @@ type Environment struct {
 
 	Extensions []*cobra.Command
 	Registries map[string]registry.Client
-	Walkers map[string]registry.Walker
+	Walkers map[string]Walker
 
 	Cache bool
+}
+
+type Walker interface {
+	Walk(source *registry.Source, env *Environment, extra string) error
+}
+
+func (env *Environment) Init() {
+	env.JobId = uuid.New().String()
+
+	home, _ := fs.GetOrCreateDir(env.Home)
+	env.HomeDir = &home
+
+	env.Config = viper.New()
+	env.Config.SetConfigName(configName)
+	env.Config.SetConfigType(configType)
+	for _, path := range env.ConfigPaths {
+		env.Config.AddConfigPath(path)
+	}
+	_ = env.Config.ReadInConfig()
+
+	env.Registries = make(map[string]registry.Client)
+	env.Extensions = make([]*cobra.Command, 0)
+	env.Walkers = make(map[string]Walker)
 }
 
 func (env *Environment) WarmJobFor(src *registry.Source) (string, error) {
@@ -64,26 +85,7 @@ func (env *Environment) WarmJobFor(src *registry.Source) (string, error) {
 	return dir, nil
 }
 
-func (env *Environment) Init() {
-	env.JobId = uuid.New().String()
-
-	home, _ := fs.GetOrCreateDir(env.Home)
-	env.HomeDir = &home
-
-	env.Config = viper.New()
-	env.Config.SetConfigName(configName)
-	env.Config.SetConfigType(configType)
-	for _, path := range env.ConfigPaths {
-		env.Config.AddConfigPath(path)
-	}
-	_ = env.Config.ReadInConfig()
-
-	env.Registries = make(map[string]registry.Client)
-	env.Extensions = make([]*cobra.Command, 0)
-	env.Walkers = map[string]registry.Walker{}
-}
-
-func (env *Environment) Doctor() error {
+func (env *Environment) SetUp() error {
 	if _, err := fs.GetOrCreateDir(env.Home); err != nil {
 		return err
 	}
@@ -99,16 +101,6 @@ func (env *Environment) Doctor() error {
 	fs.Remove(env.Home + jobDir + "/*")
 
 	if _, err := fs.GetOrCreateDir(env.Home + gitDir); err != nil {
-		return err
-	}
-
-	// @todo why?
-	if _, err := fs.GetOrCreateDir(env.Home + binDir); err != nil {
-		return err
-	}
-
-	// @todo why?
-	if _, err := fs.GetOrCreateDir(env.Home + srcDir); err != nil {
 		return err
 	}
 
