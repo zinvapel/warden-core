@@ -5,10 +5,11 @@ type Source struct {
 	Type        string
 	Url         string
 	Token       string
-	ConfigRepos []Repo `mapstructure:"repos"`
+	ConfigRepos []Repo `yaml:"repos" mapstructure:"repos"`
 }
 
 type Repo struct {
+	Id int
 	Name string
 	Group string
 	Url string

@@ -58,19 +58,19 @@ func (env *Environment) Init() {
 }
 
 func (env *Environment) WarmJobFor(src *registry.Source) (string, error) {
-	if _, err := fs.GetOrCreateDir(env.Home + jobDir); err != nil {
+	dir := env.Home + jobDir + "/" + env.JobId
+
+	if _, err := fs.GetOrCreateDir(dir); err != nil {
 		return "", err
 	}
-
-	dir := env.Home + jobDir + "/" + env.JobId
 
 	if env.Cache {
 		err := fs.ContinueInArgs(
 			env.Home,
 			"cp",
 			"-R",
-			env.Home + gitDir + "/.",
-			dir + "/.",
+			fmt.Sprintf("%s/%s/.", env.Home + gitDir, src.Name),
+			dir,
 		)
 
 		if err != nil {
@@ -137,6 +137,10 @@ func (env *Environment) FetchSourceInto(src *registry.Source, baseDir string) er
 
 		if fs.Exist(baseDir + repo.Name) {
 			// @todo add login/pass or ssh_keys
+			if err := fs.ContinueIn(baseDir + repo.Name, "git checkout -- ."); err != nil {
+				return err
+			}
+
 			if err := fs.ContinueIn(baseDir + repo.Name, "git checkout master"); err != nil {
 				return err
 			}

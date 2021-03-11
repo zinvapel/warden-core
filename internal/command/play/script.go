@@ -23,7 +23,7 @@ func (s *Script) Walk(source *registry.Source, env *environment.Environment, ext
 		return errors.New("script not found")
 	}
 
-	if dirPath, err := env.WarmJobFor(source); err == nil {
+	if dirPath, err := env.WarmJobFor(source); err != nil {
 		return err
 	} else {
 		os.Setenv("WARDEN_SOURCE_NAME", source.Name)

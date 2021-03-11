@@ -67,10 +67,13 @@ func ExecIn(path string, cmd string) (string, error) {
 }
 
 func execute(path string, cmd string, out io.Writer, in io.Reader) error {
+	fmt.Printf("Exec `%s` in `%s`\n", cmd, path)
+
 	cmdSlice := strings.Split(cmd, " ")
 	shell := exec.Command(cmdSlice[0], cmdSlice[1:]...)
 	shell.Dir = path
 	shell.Stdout = out
+	shell.Stderr = out
 	shell.Stdin = in
 
 	err := shell.Run()
