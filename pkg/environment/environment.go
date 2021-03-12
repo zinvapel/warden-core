@@ -95,7 +95,7 @@ func (env *Environment) SetUp() error {
 		return err
 	}
 
-	fs.Remove(env.Home + jobDir + "/*")
+	env.Clear()
 
 	if _, err := fs.GetOrCreateDir(env.Home + gitDir); err != nil {
 		return err
@@ -124,4 +124,8 @@ func (env *Environment) SetUp() error {
 	}
 
 	return nil
+}
+
+func (env *Environment) Clear() {
+	fs.Remove(env.Home + jobDir + "/*")
 }

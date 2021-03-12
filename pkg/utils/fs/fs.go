@@ -66,6 +66,10 @@ func ExecIn(path string, cmd string) (string, error) {
 	return buf.String(), err
 }
 
+func ExecInArgs(path string, cmd ...string) (string, error) {
+	return ExecIn(path, strings.Join(cmd, " "))
+}
+
 func execute(path string, cmd string, out io.Writer, in io.Reader) error {
 	fmt.Printf("Exec `%s` in `%s`\n", cmd, path)
 

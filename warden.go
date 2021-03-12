@@ -21,6 +21,7 @@ func NewWarden() *internal.Warden {
 	warden.Register(command.Doctor())
 	warden.Register(command.Nip())
 	warden.Register(command.Play())
+	warden.Register(command.Clean())
 
 	return warden
 }
